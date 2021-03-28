@@ -5,7 +5,7 @@ const ProgressBar = require(`progress`)
 const queue = require(`async/queue`)
 const path = require(`path`)
 const existsSync = require(`fs-exists-cached`).sync
-const { boundActionCreators } = require(`gatsby/dist/redux/actions`)
+const { actions: boundActionCreators } = require(`gatsby/dist/redux/actions`)
 
 const ffmpeg = require('fluent-ffmpeg')
 
@@ -114,7 +114,7 @@ const processFile = async (file, jobs, cb, reporter) => {
       videosFinished += 1
       bar.tick()
 
-      boundActionCreators.setJob(
+      boundActionCreators.createJobV2(
         {
           id: `processing video ${job.file.absolutePath}`,
           videosFinished,
@@ -176,7 +176,7 @@ const queueJob = (job, reporter) => {
       const jobs = _.values(toProcess[inputFileKey])
       // Delete the input key from the toProcess list so more jobs can be queued.
       delete toProcess[inputFileKey]
-      boundActionCreators.createJob(
+      boundActionCreators.createJobV2(
         {
           id: `processing video ${job.file.absolutePath}`,
           videosCount: _.values(toProcess[inputFileKey]).length,
@@ -218,9 +218,8 @@ async function queueVideoTranscode({ file, options = {}, reporter }) {
 
   const argsDigestShort = argsDigest.substr(argsDigest.length - 5)
 
-  const videoSrc = `/${file.name}-${
-    file.internal.contentDigest
-  }-${argsDigestShort}.${fileExtension}`
+  const videoSrc = `/${file.name}-${file.internal.contentDigest
+    }-${argsDigestShort}.${fileExtension}`
   const filePath = path.join(process.cwd(), `public`, `static`, videoSrc)
 
   // Create function to call when the image is finished.
