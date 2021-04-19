@@ -188,7 +188,7 @@ const queueJob = (job, reporter) => {
         job.file,
         jobs,
         () => {
-          boundActionCreators.endJob(
+          boundActionCreators.createJobV2(
             {
               id: `processing video ${job.file.absolutePath}`,
             },
